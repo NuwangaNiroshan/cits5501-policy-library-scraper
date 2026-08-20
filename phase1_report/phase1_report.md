@@ -69,9 +69,9 @@ Rank the top three factors in order of importance:
 
 **Top three factors:**
 
-1. 
-2. 
-3. 
+1. Library support
+2. Familiarity with the language
+3. Ease of debugging
 
 What advantages do you expect your chosen language to give your team?
 
@@ -82,6 +82,20 @@ If you had to implement this project in the other language, what do you think wo
 What might be easier?
 
 **Answer:**
+
+The group has chosen Python. *(To be confirmed with everyone. If any member has not used Python before, we will note here how they plan to get up to speed, e.g. pairing on early tasks and working through the official tutorial.)*
+
+Why these three factors, in this order:
+
+1. **Library support.** The project is scraping plus document parsing (PDF, Word, RTF), and Python has mature, well-documented libraries for every step: `httpx` or `requests` for HTTP, `pypdf` for PDF, `python-docx` for Word. One member has built a FastAPI backend that relied on `httpx` and `python-docx` in production and found them solid. Java has equivalents (Apache PDFBox, Apache POI) but they generally need more setup and more code for the same task.
+2. **Familiarity with the language.** Python is the language most of the group has in common *(confirm per member)*. One member has completed two Python projects with pytest suites (a FastAPI backend with acceptance and end-to-end tests, and a smaller CLI tool), so the testing workflow this unit focuses on is something the group has already done in Python.
+3. **Ease of debugging.** No compile step, a REPL for poking at a half-parsed document, and readable stack traces. In scraping work most "bugs" are surprises in external data, and the quickest way to diagnose them is to inspect real responses interactively.
+
+Advantages we expect: fast iteration, concise code so more effort goes into behaviour and tests instead of boilerplate, and pytest's low setup cost makes it easier for every member to write tests.
+
+Disadvantages and risks: with dynamic typing, mistakes such as wrong argument types, misspelled attributes or `None` leaking through only show up at runtime. In a five-person codebase that is a real integration risk, which is the main reason we plan to run a type checker in CI (see Q12). Performance is a theoretical disadvantage but not a practical one here, since the bottleneck of a scraper is the network, not the interpreter.
+
+If we had to use Java instead, the hardest part for us would be the build and dependency toolchain (nobody in the group has real Gradle or Maven experience *(confirm)*), and the amount of boilerplate for a small CLI tool. What would be easier in Java is that the compiler and static typing catch integration mistakes at build time for free. In Python we have to opt in to that via mypy, which is what we intend to do.
 
 ---
 
@@ -98,6 +112,14 @@ Examples:
 Has anyone in the group used it before, or will this be the first time setting up a project with it?
 
 **Answer:**
+
+We will use `uv`, for three reasons:
+
+1. The marking environment has `uv` pre-installed, so our setup instructions can be a single command (`uv sync`) with no bootstrap step.
+2. It keeps a lockfile (`uv.lock`), so every member and the CI runner install identical dependency versions.
+3. It is fast enough that a clean install in CI takes seconds rather than minutes.
+
+This will be the first time any of us has used `uv` on a real project *(confirm per member)*. The underlying ideas are familiar though. One member's FastAPI project pins every dependency to an exact version in `requirements.txt`, and a monorepo project they work on pins the package manager version and runs frozen installs in CI, so the build fails if the lockfile and manifest disagree instead of silently installing something newer. `uv` is a more integrated version of the same pin, lock, frozen-install workflow, so we expect the learning curve to be short. One member will set up the initial `pyproject.toml` and lockfile so everyone else starts from a working template.
 
 ---
 
@@ -237,6 +259,15 @@ Is your team familiar with any static analysis/linting tools such as:
 Do you plan to use any?
 
 **Answer:**
+
+Yes to both. We will use `mypy` as the type checker and `ruff` as the linter (ruff also handles formatting, so we do not need black separately). Both will run in CI on every push and pull request as blocking checks, not just advisory ones. See Q13 and Q15 for how this fits with our merge policy and CI setup.
+
+Nobody in the group has used mypy or ruff specifically *(confirm per member)*, but one member has run the equivalent workflow in TypeScript, which is where this plan comes from. Their browser-extension project runs the compiler in strict mode with a type-check-only script (`tsc --noEmit`) that must pass before a build ships, and a monorepo they contribute to runs a `typecheck` step in CI as a merge gate, alongside `shellcheck` for shell scripts. Two things we learned from running that setup and want to apply here:
+
+1. Type checking catches integration mistakes between people, not just typos. If module A changes a return shape and module B does not notice, a strict type check fails immediately instead of it surfacing as a runtime bug days later. With five people writing separate parts of the scraper (fetcher, parsers, query engine), that is the kind of bug we would otherwise ship. It matters more in Python than in TypeScript because without mypy nothing else catches it before runtime (see the dynamic typing risk in Q3).
+2. Checks only change behaviour if they are automatic and blocking. A linter people are supposed to run by hand stops being run in the week before a deadline, which is when it is needed most. Running mypy and ruff in CI costs seconds per push.
+
+We will start with a small configuration that is strict on new code rather than trying to make every rule pass on day one, so the checks stay useful instead of becoming something people work around.
 
 ---
 
