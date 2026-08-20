@@ -109,11 +109,14 @@ What parts of a web scraper do you expect could most easily fail, and how?
 
 **Answer:**
 
-HTML parsing is the component most likely to fail. CSS selectors and XPath queries break silently if the website’s underlying markup changes. The scraper is also fragile due to:
+HTML parsing is the component most likely to fail. CSS selectors and XPath queries break silently if the website’s underlying markup changes: the scraper does not crash, it simply returns nothing — or worse, returns the *wrong* element. This is not hypothetical. In a previous web-clipper project built by one team member, a minor front-end change on the target site caused an extractor that selected content by a single class name to start returning author names from the comment section instead of the author block; no error was thrown, the output was just quietly wrong. Two mitigations worked there and we plan to reuse them: (1) every critical field gets a *fallback chain* of selectors (id → class variant → whole document) so a partial redesign degrades gracefully rather than failing outright, and (2) fields are matched by *content patterns* (e.g. a date pattern that tolerates prefixes such as "edited on …", hashtags identified as anchor text starting with `#`) rather than by positional assumptions. For the policy library the equivalent risk is locating document links and metadata in listing pages.
 
-* **Network issues:** Timeouts, connection resets, and non-200 HTTP responses.
-* **Document parsing problems:** Corrupted, password-protected/encrypted, or scanned non-searchable PDF, DOCX, or RTF documents.
+The scraper is also fragile due to:
+
+* **Network issues:** Timeouts, connection resets, rate limiting (HTTP 429), and non-200 HTTP responses. These are routine rather than exceptional; the failure mode to avoid is a single bad response aborting a whole crawl, or a naive retry loop hammering a server that is already limiting us. Since the brief explicitly warns of temporary unavailability and rate limiting, this layer needs bounded retries with backoff from day one.
+* **Document parsing problems:** Corrupted, truncated, password-protected/encrypted, or scanned non-searchable PDF, DOCX, or RTF documents — and *mislabelled* files, e.g. a `Content-Type` header that says PDF while the body is an HTML error page. Third-party parser libraries can throw on malformed input, so every parse call must be treated as fallible. (In the clipper project, "the URL looked like an image" turned out to be an unreliable signal; a content-type whitelist plus per-file size limits were needed when downloading.)
 * **Character encoding mismatches:** Inconsistent character encodings (e.g., UTF-8 vs ISO-8859-1) that can corrupt document titles and text without raising an explicit crash.
+* **Link discovery and traversal:** Broken links, redirect chains, and relative-URL resolution errors. The real danger is unbounded behaviour — following redirects forever or re-visiting the same pages in a cycle. Our rule: *every loop that depends on external input must have an explicit bound* (the clipper's lazy-loading comment scraper, for instance, was capped at 8 scroll rounds and stopped as soon as the item count stopped growing).
 
 ---
 
@@ -125,10 +128,11 @@ Which external factors could make your software stop working after it has been c
 
 Several external factors outside our direct control could cause the software to stop functioning:
 
-* **Website redesigns & URL changes:** Alterations to DOM element hierarchies, CSS class names, or URL routing and pagination schemes.
-* **Anti-bot measures & access restrictions:** Introduction of rate limits, IP blocking, CAPTCHAs, or changes requiring user authentication/login.
-* **Client-side rendering:** Migration to dynamic JavaScript-rendered single-page application (SPA) architectures that require browser execution.
-* **Network & environment changes:** Server-side TLS/SSL certificate changes, deprecation of upstream HTTP/parsing libraries, or breaking runtime updates in Python.
+* **Website redesigns & URL changes:** Alterations to DOM element hierarchies, CSS class names, or URL routing and pagination schemes. This is the number-one killer of "finished" scrapers — see Q5 for a case where it happened mid-project.
+* **Anti-bot measures & access restrictions:** Introduction of rate limits, IP blocking, CAPTCHAs, or changes requiring user authentication/login. A crawl rate that works today may start returning 429s tomorrow; the scraper still "works", but the environment's tolerance changed.
+* **Client-side rendering:** Migration to dynamic JavaScript-rendered single-page application (SPA) architectures that require browser execution. A related case from the clipper project: one site exposed page data only through a JavaScript-assigned global (`__INITIAL_STATE__`) with no inline JSON in the HTML, so a markup-based scraper lost its data source entirely and a separate bridge script was needed. A scraper's "contract" with a site is completely one-sided.
+* **Resources moving or expiring:** Hosted files can be moved, hotlink-protected, or expire. In the clipper project, CDN image URLs expired, so any note that merely *linked* to images silently lost them weeks later; the fix was to localise content at capture time. The analogous decision for our project is to store retrieved policy documents locally rather than re-fetch them on every query.
+* **Network & environment changes:** Server-side TLS/SSL certificate changes, deprecation of upstream HTTP/parsing libraries, or breaking runtime updates in Python. Pinning dependency versions via the `uv` lockfile (see Q4) mitigates the dependency-drift part of this.
 
 ---
 
@@ -140,8 +144,10 @@ Which do you expect will be hardest?
 
 **Answer:**
 
-* **Easiest to test:** Pure, deterministic logic that operates without network or filesystem dependencies. This includes CLI argument parsing, query string validation, and document parsing against static, local test fixtures.
-* **Hardest to test:** The live HTTP network layer, retry and backoff timing logic, and error paths for transient network failures (e.g., dropped connections, timeouts, partial downloads). Testing these reliably requires mock servers and simulated network faults rather than hitting the live university website.
+* **Easiest to test:** Pure, deterministic logic that operates without network or filesystem dependencies. This includes CLI argument parsing, query string validation, and document parsing against static, local test fixtures — i.e. query parsing and matching logic, text extraction from an already-downloaded document, URL normalisation, and output formatting. These are easy because a saved fixture (a captured HTML fragment or document sample) can be fed in and the exact output asserted, with no network and no timing. This matches experience from the clipper project, where the well-covered parts were exactly these: HTML-fragment → Markdown conversion, filename sanitisation, URL validation, and path handling.
+* **Hardest to test:** The live HTTP network layer, retry and backoff timing logic, and error paths for transient network failures (e.g., dropped connections, timeouts, partial downloads), plus end-to-end crawls of the real site. In the clipper project the least-verified feature was precisely the one that only emerged against a live, changing site (scroll to trigger lazy loading, detect when loading has finished) — it could not be meaningfully unit-tested and relied on manual acceptance checklists.
+
+The design consequence we draw from this: **isolate I/O behind an interface** (dependency-inject the HTTP layer) so the "hard" behaviours become testable. A fake HTTP layer or a local mock server can then be scripted to return 429s, timeouts, truncated bodies, and malformed documents on demand, turning integration-only risks into fast, repeatable unit tests. This decision has to be made early because it shapes the architecture; it cannot be retrofitted cheaply.
 
 ---
 
@@ -153,13 +159,17 @@ How could those assumptions be violated?
 
 **Answer:**
 
-Our software makes several key assumptions about the target website:
+Every scraper embeds assumptions; the useful discipline is stating them explicitly, because each one is a future failure mode. Our software is likely to assume:
 
-* **Structural stability:** Assuming that HTML markup structure, element IDs, and CSS classes remain consistent.
-* **Protocol & metadata validity:** Assuming HTTP status codes are used accurately (e.g., 404 for missing pages) and that `Content-Type` headers correctly match the actual file content.
-* **Document integrity:** Assuming linked policy documents are well-formed and accessible directly via static HTTP GET requests without requiring JavaScript execution or session cookies.
+* **Structural stability:** HTML markup structure, element IDs, and CSS classes remain consistent. *Violated by* site redesigns — mitigated by the selector fallback chains described in Q5.
+* **Protocol & metadata validity:** HTTP status codes are used accurately (e.g., 404 for missing pages) and `Content-Type` headers correctly match the actual file content. *Violated by* error pages served with 200 status, or a "PDF" link that returns HTML. Headers should not be trusted alone; validate by content (whitelist + size limits).
+* **Document integrity:** Linked policy documents are well-formed and accessible directly via static HTTP GET requests without requiring JavaScript execution or session cookies. *Violated by* truncated or malformed PDF/RTF files that crash naive parsers — parsing must be treated as fallible.
+* **Page data corresponds to the current URL:** *Violated by* single-page-app navigation — in the clipper project, embedded page data could describe the *previous* item after in-site navigation. The fix was to cross-check identity (item id in the data vs the URL) and discard stale data. The analogue for us: verify a fetched document actually matches its listing entry.
+* **Links are resolvable and finite:** *Violated by* dead links, redirect loops, and circular references — mitigated with bounded traversal.
+* **Text is UTF-8:** *Violated by* legacy encodings in older documents (RTF especially), corrupting extracted text.
+* **The site is finite and paginated in the expected way:** *Violated when* pagination schemes change or lazy loading replaces pagination.
 
-These assumptions can be violated at any time without prior notice if the website administrators update the CMS, restructure URL paths, or alter document hosting practices.
+These assumptions can be violated at any time without prior notice if the website administrators update the CMS, restructure URL paths, or alter document hosting practices. Where an assumption cannot be removed, we will document it explicitly as a numbered assumption and, wherever practical, *detect* the violation at runtime and fail with a clear message rather than produce wrong output silently — silent wrongness is the worst outcome, because tests pass and users trust the result.
 
 ---
 
@@ -306,13 +316,19 @@ What might they try first?
 
 **Answer:**
 
-To find flaws in the application, another student might try:
+An attacker goes straight for *unstated limits* and *implicit assumptions*. To find flaws in the application, another student might try:
 
-* **Invalid CLI arguments:** Passing missing, contradictory, or unexpected command-line flags and arguments.
-* **Network fault simulation:** Disconnecting the network during execution, introducing high latency/timeouts, or redirecting the tool to URLs returning 404/500 errors.
-* **Malformed data inputs:** Pointing the scraper to corrupted, empty, or non-standard file types.
+* **Invalid CLI arguments:** Passing missing, contradictory, or unexpected command-line flags and arguments; also nonsense queries — an empty query, a query matching nothing, a query matching everything, special characters — to check whether the query interface validates input rather than passing it straight through.
+* **Oversized input:** A huge document, or a listing page with hundreds of linked files. Anything without a stated limit is a place to attack. (In the clipper project, long notes were silently truncated by an undocumented length cap in the save channel; the fix was explicit limits everywhere — per-file size, per-page item count.)
+* **Network fault simulation:** Disconnecting the network during execution, introducing high latency/timeouts, or redirecting the tool to URLs returning 404/500 errors — and a deliberately hostile server: endless redirects, HTTP 429 floods, responses slow enough to never quite time out, empty 200 responses. Watch for unbounded retry loops.
+* **Malformed data inputs:** Pointing the scraper to corrupted, empty, or non-standard file types — a truncated PDF, an RTF full of garbage bytes, an HTML error page renamed `.pdf`. Does the program crash, hang, or record a clean per-document error and continue?
+* **Malicious link targets:** Discovered links that point at `http://127.0.0.1:…` or other internal addresses, tricking the scraper into requesting local services (an SSRF-style attack). The clipper project had to enforce an allow-list of HTTPS hosts and reject loopback/unknown domains; our scraper should likewise be suspicious of where discovered links actually point.
+* **Filename and path tricks:** Documents named `../../etc/passwd`, names with control characters, or two documents with the same name. Filenames must be sanitised and the program must never silently overwrite — collisions get a numeric suffix.
+* **Unicode and encoding edge cases:** Emoji, right-to-left text, CJK characters in titles and queries.
 * **Concurrency and edge conditions:** Running multiple instances simultaneously against the same output directory or abruptly terminating the process (SIGINT/SIGTERM) mid-download.
 * **Error stream leaks:** Checking whether error messages or unhandled stack traces are leaked to standard output (`stdout`) instead of standard error (`stderr`).
+
+Our defence is to make limits explicit, bound every loop and size, and turn each of the above into a test case before anyone else does.
 
 ---
 
@@ -356,6 +372,14 @@ At this stage of the project, what do you think will be the biggest challenge in
 **Answer:**
 
 The biggest challenge is managing testing against an uncontrolled external dependency. Relying on the live website makes test suites slow, non-deterministic, and prone to flakiness, while relying solely on mocked tests risks making assumptions that do not reflect real-world site behaviors and failure modes. Balancing robust mock-based unit tests with realistic integration tests across three different document formats (PDF, Word, RTF) represents the primary reliability risk.
+
+Underlying this is a broader point: **the dominant failure modes live outside our code, so reliability has to be designed and tested as *behaviour under failure*, not as a correct happy path.** In the clipper project almost none of the real bugs were in the core logic; they were at the boundaries — markup that changed, data that was stale, resources that expired, limits that were undocumented. A test suite that only exercises the happy path would have caught none of them. Concretely we see three parts to the challenge:
+
+1. **Deciding failure policy early and consistently.** For every operation: retry (how many times, with what backoff), skip and record, or abort? In the clipper project the policy "one failed image keeps its original link and is counted, but never blocks the save" was the difference between a robust feature and an unusable one. With five people writing code, an *agreed* policy matters more than a clever one; otherwise behaviour under stress becomes inconsistent and untestable.
+2. **Making failure testable.** Real 429s and outages cannot be summoned on demand, so unless we architect for it (injectable HTTP layer, mock-server fixtures with broken/malformed responses — see Q7), our error-handling code will be the least-tested code in the project while being the code reviewers most want to see work.
+3. **Detecting silent wrongness.** The scariest failures produce plausible output rather than crashes (Q5, Q8). We need checks that the output is *correct*, not merely present — e.g. validating that a retrieved document's identity matches its listing entry, and asserting on exact expected content from known fixtures.
+
+Getting these three right in the design phase makes the implementation phase far less risky; retrofitting any of them later is expensive.
 
 ---
 
