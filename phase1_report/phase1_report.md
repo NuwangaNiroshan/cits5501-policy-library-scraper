@@ -232,6 +232,12 @@ Has the group used it before, or only heard of it?
 
 **Answer:**
 
+The group has chosen pytest as the testing framework, mainly because it is simpler to set up and 
+use than Python’s built-in testing framework. A few team members have some basic familiarity with 
+pytest, including using it for unit and integration testing, while others have limited experience 
+with dedicated testing frameworks. This will therefore be an opportunity for the group to learn and 
+share knowledge together.
+
 ---
 
 ## CI / Automation
@@ -270,6 +276,15 @@ How will you know that your software is producing the correct output, rather tha
 
 **Answer:**
 
+Running without errors is not the same as producing the right result. To check this properly, a few 
+real policy pages and documents will be reviewed and saved with known expected results. The 
+program’s output can then be compared against these saved results. Using saved test data also means 
+that testing will not depend only on live website content, which may change over time.
+
+The program will also be tried on messy or broken inputs, such as missing files or dead links, to 
+make sure it responds sensibly instead of quietly giving the wrong answer. The goal is to confirm 
+that the program is getting things right, not just that it runs.
+
 ---
 
 ### 18. Evidence of Reliability
@@ -277,6 +292,14 @@ How will you know that your software is producing the correct output, rather tha
 What evidence would increase your confidence that your software is reliable?
 
 **Answer:**
+
+Evidence that would increase the team’s confidence in the software’s reliability includes:
+
+* Results staying consistent when tests are run more than once
+* Someone other than the person who made a change trying to find problems with it
+* The program working properly on a different computer, not just the one on which it was developed
+* The scraper handling a slow or unavailable website without unexpectedly failing
+* Regression tests showing that old bugs have not reappeared after being fixed
 
 ---
 

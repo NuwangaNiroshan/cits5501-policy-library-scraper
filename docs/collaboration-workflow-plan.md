@@ -16,4 +16,16 @@ We will use GitHub with separate branches for each feature or task.
 Changes will be submitted using pull requests and reviewed by another team member before merging.
 
 ## Resource Risks
-If a member is unavailable, their important tasks will be reassigned to another team member.
+
+The main risks to the group’s progress include illness, clashing deadlines from other units, or a 
+group member becoming hard to reach without warning. To manage this, tasks will be broken into 
+smaller, more manageable pieces and given internal milestones so that progress does not depend too 
+heavily on any single person.
+
+A shared tracker will be maintained so everyone can see what has been completed and what is still 
+outstanding. Regular check-ins will also help identify problems early rather than discovering them 
+immediately before the deadline.
+
+Important progress, decisions and remaining work will be recorded in documented handovers. If 
+someone becomes unavailable, another member should then be able to continue the essential work 
+without having to start again.
