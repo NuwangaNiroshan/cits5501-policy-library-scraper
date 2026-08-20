@@ -7,7 +7,7 @@
 Where is your group’s Collaboration & Workflow Plan maintained? Is it in the Git repository, or elsewhere?
 
 **Answer:**
-
+Our Collaboration & Workflow Plan is maintained in docs/collaboration-workflow-plan.md within the team’s private GitHub repository. Keeping the plan in the repository gives all members access to the current version and allows updates to be tracked and reviewed through Git.
 ---
 
 ### 2. Task Tracking
@@ -19,7 +19,9 @@ Why did you choose it?
 Has anyone in the group used it before?
 
 **Answer:**
+We use GitHub Issues to allocate and track project tasks. Each work package is recorded as an issue containing a task description, completion criteria, relevant labels and an assigned team member. Pull requests are linked to their corresponding issues so that progress can be followed from allocation through review and completion.
 
+We chose GitHub Issues because the project is already hosted on GitHub, so we do not need to manage another platform. It also provides a visible and traceable record of task ownership and completion. Most team members have previously used GitHub Issues, including in earlier university projects, and are familiar with the basic workflow.
 ---
 
 ## Language and Tooling
@@ -125,7 +127,9 @@ Suppose a serious bug is discovered two days before the deadline.
 How would your team investigate and respond?
 
 **Answer:**
+If a serious bug is discovered two days before the deadline, we will first reproduce it and record the relevant inputs, environment and observed behaviour. We will assess its severity, identify the affected parts of the application and prioritise the issue. Appropriate members will then investigate the cause and test the proposed fix.
 
+The fix will be submitted through a pull request and reviewed by another team member. Where possible, a regression test will be added to reproduce the original failure and confirm that it has been corrected. We will avoid unrelated changes while resolving the bug and seek advice from our facilitator if we need additional support.
 ---
 
 ### 10. Definition of Finished
@@ -133,7 +137,9 @@ How would your team investigate and respond?
 What will convince your team that a feature is "finished"?
 
 **Answer:**
+A feature will be considered finished when it satisfies its agreed requirements and acceptance criteria, produces the expected results and handles relevant error conditions. Its automated tests and agreed quality checks must pass, and any necessary documentation must be updated.
 
+The change must also be submitted through a pull request, reviewed by someone other than the author and merged into the main branch. Writing the code alone is therefore not enough for a feature to be considered finished.
 ---
 
 ### 11. Resolving Disagreements
@@ -141,7 +147,9 @@ What will convince your team that a feature is "finished"?
 If two group members disagree about whether software is "working correctly", how will you resolve that disagreement?
 
 **Answer:**
+If two members disagree about whether the software is working correctly, we will compare its behaviour with the project specification and agreed requirements. We will reproduce the behaviour using the same input and environment and examine or create a test with a clearly defined expected result.
 
+The decision will be based on the specification and observable evidence rather than personal preference. If the specification does not provide enough information to determine the correct behaviour, we will document the uncertainty and ask our facilitator for clarification.
 ---
 
 ## Code Quality
