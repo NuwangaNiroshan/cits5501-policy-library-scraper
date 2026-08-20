@@ -194,7 +194,9 @@ What will be the consequences?
 
 Will merges be blocked if these checks fail, or will the checks be advisory only?
 
-**Answer:**
+If a group member’s code does not pass the agreed linting or type-checking checks the merge should be blocked until the problems are fixed. The person who made the changes should correct the issues and run the checks again before requesting approval. If the failure is caused by an unusual case or a tool configuration problem, then the team can discuss it and agree on an exception.
+
+This makes the checks part of our quality gate, rather than only giving warnings. It also helps prevent avoidable code-quality problems from being merged into the main branch.
 
 ---
 
@@ -226,7 +228,9 @@ Or will you run tests manually before submission?
 
 Have any members of your group used continuous integration before?
 
-**Answer:**
+We use GitHub Actions to run our tests automatically when code is pushed or a pull request is created. This allows us to catch problems early, before code is merged into the main branch. We can still do the tests manually while we are developing. But the automatic checks will be the main check before merging them.
+
+Some of the group members have experience with continuous integration, others less so. One member has used GitHub Actions in a previous project. We can start with a simple workflow and help each other to understand how it works.
 
 ---
 
@@ -276,4 +280,6 @@ What will be your code review process?
 
 Does someone other than the author review changes before merging, or is this informal?
 
-**Answer:**
+We will use pull requests for code review. Each important feature will be developed on separate branch. When the work is complete, the team member will push the branch and create a pull request. At least one  other team members will review the changes and then merge it in the main branch. The reviewer will look at the code, the tests, error handling and if the change meets the project requirements.
+
+If any issues are discovered, the author will correct them before the pull request is approved. The code will not be merged until the review is complete and the required automated checks pass. This process will help us find problems early, keep the code quality consistent, and make sure more than one team member understands important changes.
