@@ -1,5 +1,19 @@
 # CITS5501 Project 2026 – Phase 1 Report
 
+**Repository URL:** [https://github.com/NuwangaNiroshan/cits5501-policy-library-scraper](https://github.com/NuwangaNiroshan/cits5501-policy-library-scraper)
+
+## Group Members
+
+| Full Name | Student Number | GitHub Username |
+| :--- | :--- | :--- |
+| Roshan Shanker | 24819852 | `Roshss2508` |
+| Nuwanga Niroshan Hewa Wiladdarage | 24684008 | `NuwangaNiroshan` |
+| Cam Zhou | 24349432 | `camzhou831-star` |
+| Sharmel Rayen Remington Villava Rayen | 25079168 | `SharmelRayen` |
+| Swathy Shenoy | 25068786 | `Swathymahesh` |
+
+---
+
 ## Planning and Organization
 
 ### 1. Collaboration & Workflow Plan
