@@ -7,7 +7,7 @@ We will use Microsoft Teams for group communication.
 We will meet once a week and when needed.
 
 ## Task Management
-We will use GitHub Projects to assign and track tasks.
+We will use GitHub Issues & GitHub Projects to assign and track tasks.
 
 ## Version Control
 We will use GitHub with separate branches for each feature or task.

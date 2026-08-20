@@ -18,30 +18,15 @@
 
 ### 1. Collaboration & Workflow Plan
 
-Where is your group’s Collaboration & Workflow Plan maintained? Is it in the Git repository, or elsewhere?
-
-**Answer:**
-
-Our Collaboration & Workflow Plan is maintained in docs/collaboration-workflow-plan.md within the team’s private GitHub repository. Keeping the plan in the repository gives all members 
-access to the current version and allows updates to be tracked and reviewed through Git.
+Our Collaboration & Workflow Plan is maintained in `docs/collaboration-workflow-plan.md` within the team’s private GitHub repository. Keeping the plan in the repository gives all members access to the current version and allows updates to be tracked and reviewed through Git.
 
 ---
 
 ### 2. Task Tracking
 
-What tool or approach are you using to track assigned tasks and completion?
+We use GitHub Issues to allocate and track project tasks. Each work package is recorded as an issue containing a task description, completion criteria, relevant labels and an assigned team member. Pull requests are linked to their corresponding issues so that progress can be followed from allocation through review and completion.
 
-Why did you choose it?
-
-Has anyone in the group used it before?
-
-**Answer:**
-
-We use GitHub Issues to allocate and track project tasks. Each work package is recorded as an issue containing a task description, completion criteria, relevant labels and an assigned 
-team member. Pull requests are linked to their corresponding issues so that progress can be followed from allocation through review and completion.
-
-We chose GitHub Issues because the project is already hosted on GitHub, so we do not need to manage another platform. It also provides a visible and traceable record of task ownership and 
-completion. Most team members have previously used GitHub Issues, including in earlier university projects, and are familiar with the basic workflow.
+We chose GitHub Issues because the project is already hosted on GitHub, so we do not need to manage another platform. It also provides a visible and traceable record of task ownership and completion. Most team members have previously used GitHub Issues, including in earlier university projects, and are familiar with the basic workflow.
 
 ---
 
@@ -49,55 +34,9 @@ completion. Most team members have previously used GitHub Issues, including in e
 
 ### 3. Implementation Language
 
-Which language has your group chosen?
-
-Have any members of the group not used it – and if so, how will they get familiar with it?
-
-#### Factors Influencing the Language Choice
-
-Rank the top three factors in order of importance:
-
-- Familiarity with the language
-- Team members’ experience
-- Library support
-- Ease of debugging
-- Performance
-- Maintainability
-- Assessment considerations
-- Career value
-- Other (explain)
-
-**Top three factors:**
-
-1. 
-2. 
-3. 
-
-What advantages do you expect your chosen language to give your team?
-
-What disadvantages or risks do you expect?
-
-If you had to implement this project in the other language, what do you think would be most difficult?
-
-What might be easier?
-
-**Answer:**
-
 ---
 
 ### 4. Build and Dependency Management
-
-What build/dependency management tool will you use?
-
-Examples:
-
-- Python: `uv` or Poetry
-- Java: Gradle or Maven
-- Other suitable tool
-
-Has anyone in the group used it before, or will this be the first time setting up a project with it?
-
-**Answer:**
 
 ---
 
@@ -105,37 +44,17 @@ Has anyone in the group used it before, or will this be the first time setting u
 
 ### 5. Web Scraper Failures
 
-What parts of a web scraper do you expect could most easily fail, and how?
-
-**Answer:**
-
 ---
 
 ### 6. External Factors
-
-Which external factors could make your software stop working after it has been completed?
-
-**Answer:**
 
 ---
 
 ### 7. Testing Difficulty
 
-Which components of your project do you think will be easiest to test?
-
-Which do you expect will be hardest?
-
-**Answer:**
-
 ---
 
 ### 8. Website Assumptions
-
-What assumptions is your software likely to make about the website it scrapes?
-
-How could those assumptions be violated?
-
-**Answer:**
 
 ---
 
@@ -143,42 +62,25 @@ How could those assumptions be violated?
 
 ### 9. Responding to a Serious Bug
 
-Suppose a serious bug is discovered two days before the deadline.
+If a serious bug is discovered two days before the deadline, we will first reproduce it and record the relevant inputs, environment and observed behaviour. We will assess its severity, identify the affected parts of the application and prioritise the issue. Appropriate members will then investigate the cause and test the proposed fix.
 
-How would your team investigate and respond?
-
-**Answer:**
-If a serious bug is discovered two days before the deadline, we will first reproduce it and record the relevant inputs, environment and observed behaviour. We will assess its severity, 
-identify the affected parts of the application and prioritise the issue. Appropriate members will then investigate the cause and test the proposed fix.
-
-The fix will be submitted through a pull request and reviewed by another team member. Where possible, a regression test will be added to reproduce the original failure and confirm that it 
-has been corrected. We will avoid unrelated changes while resolving the bug and seek advice from our facilitator if we need additional support.
+The fix will be submitted through a pull request and reviewed by another team member. Where possible, a regression test will be added to reproduce the original failure and confirm that it has been corrected. We will avoid unrelated changes while resolving the bug and seek advice from our facilitator if we need additional support.
 
 ---
 
 ### 10. Definition of Finished
 
-What will convince your team that a feature is "finished"?
+A feature will be considered finished when it satisfies its agreed requirements and acceptance criteria, produces the expected results and handles relevant error conditions. Its automated tests and agreed quality checks must pass, and any necessary documentation must be updated.
 
-**Answer:**
-A feature will be considered finished when it satisfies its agreed requirements and acceptance criteria, produces the expected results and handles relevant error conditions. Its automated 
-tests and agreed quality checks must pass, and any necessary documentation must be updated.
-
-The change must also be submitted through a pull request, reviewed by someone other than the author and merged into the main branch. Writing the code alone is therefore not enough for a 
-feature to be considered finished.
+The change must also be submitted through a pull request, reviewed by someone other than the author and merged into the main branch. Writing the code alone is therefore not enough for a feature to be considered finished.
 
 ---
 
 ### 11. Resolving Disagreements
 
-If two group members disagree about whether software is "working correctly", how will you resolve that disagreement?
+If two members disagree about whether the software is working correctly, we will compare its behaviour with the project specification and agreed requirements. We will reproduce the behaviour using the same input and environment and examine or create a test with a clearly defined expected result.
 
-**Answer:**
-If two members disagree about whether the software is working correctly, we will compare its behaviour with the project specification and agreed requirements. We will reproduce the 
-behaviour using the same input and environment and examine or create a test with a clearly defined expected result.
-
-The decision will be based on the specification and observable evidence rather than personal preference. If the specification does not provide enough information to determine the correct 
-behaviour, we will document the uncertainty and ask our facilitator for clarification.
+The decision will be based on the specification and observable evidence rather than personal preference. If the specification does not provide enough information to determine the correct behaviour, we will document the uncertainty and ask our facilitator for clarification.
 
 ---
 
@@ -186,45 +88,9 @@ behaviour, we will document the uncertainty and ask our facilitator for clarific
 
 ### 12. Type Checking and Linting
 
-#### Python Groups
-
-Will you use a type checker such as:
-
-- `mypy`
-- `pyright`
-
-If so, will it run in CI or just periodically/manually?
-
-Has anyone used one before?
-
-Do you plan to use a linter such as:
-
-- `pylint`
-- `black`
-
-#### Java Groups
-
-Is your team familiar with any static analysis/linting tools such as:
-
-- Checkstyle
-- SpotBugs
-- PMD
-
-Do you plan to use any?
-
-**Answer:**
-
 ---
 
 ### 13. Failed Quality Checks
-
-Suppose a group member’s contribution does not pass your linting or type-checking checks.
-
-What will be the consequences?
-
-Will merges be blocked if these checks fail, or will the checks be advisory only?
-
-**Answer:**
 
 If a group member’s code does not pass the agreed linting or type-checking checks the merge will be blocked until the problems are fixed. The person who made the changes should correct the issues and run the checks again before requesting approval. If the failure is caused by an unusual case or a tool configuration problem, then the team can discuss it and agree on an exception.
 
@@ -236,37 +102,13 @@ This makes the checks part of our quality gate, rather than only giving warnings
 
 ### 14. Testing Framework
 
-What test framework will you use?
-
-Examples:
-
-- Python: `pytest`
-- Java: JUnit 5
-- Other suitable framework
-
-Has the group used it before, or only heard of it?
-
-**Answer:**
-
-The group has chosen pytest as the testing framework, mainly because it is simpler to set up and 
-use than Python’s built-in testing framework. A few team members have some basic familiarity with 
-pytest, including using it for unit and integration testing, while others have limited experience 
-with dedicated testing frameworks. This will therefore be an opportunity for the group to learn and 
-share knowledge together.
+The group has chosen pytest as the testing framework, mainly because it is simpler to set up and use than Python’s built-in testing framework. A few team members have some basic familiarity with pytest, including using it for unit and integration testing, while others have limited experience with dedicated testing frameworks. This will therefore be an opportunity for the group to learn and share knowledge together.
 
 ---
 
 ## CI / Automation
 
 ### 15. Continuous Integration
-
-Will you set up continuous integration, such as GitHub Actions, to run your test suite automatically?
-
-Or will you run tests manually before submission?
-
-Have any members of your group used continuous integration before?
-
-**Answer:**
 
 We use GitHub Actions to run our tests automatically when code is pushed or a pull request is created. This allows us to catch problems early, before code is merged into the main branch. We can still do the tests manually while we are developing. However, the automated checks must pass before a pull request is merged.
 
@@ -278,38 +120,17 @@ Some of the group members have experience with continuous integration, others le
 
 ### 16. Trying to Break the Scraper
 
-Suppose your scraper is finished and submitted.
-
-Now imagine another student is trying to break your software and get it to exhibit failures or unexpected behaviour.
-
-What might they try first?
-
-**Answer:**
-
 ---
 
 ### 17. Correctness of Output
 
-How will you know that your software is producing the correct output, rather than merely some output?
+Running without errors is not the same as producing the right result. To check this properly, a few real policy pages and documents will be reviewed and saved with known expected results. The program’s output can then be compared against these saved results. Using saved test data also means that testing will not depend only on live website content, which may change over time.
 
-**Answer:**
-
-Running without errors is not the same as producing the right result. To check this properly, a few 
-real policy pages and documents will be reviewed and saved with known expected results. The 
-program’s output can then be compared against these saved results. Using saved test data also means 
-that testing will not depend only on live website content, which may change over time.
-
-The program will also be tried on messy or broken inputs, such as missing files or dead links, to 
-make sure it responds sensibly instead of quietly giving the wrong answer. The goal is to confirm 
-that the program is getting things right, not just that it runs.
+The program will also be tried on messy or broken inputs, such as missing files or dead links, to make sure it responds sensibly instead of quietly giving the wrong answer. The goal is to confirm that the program is getting things right, not just that it runs.
 
 ---
 
 ### 18. Evidence of Reliability
-
-What evidence would increase your confidence that your software is reliable?
-
-**Answer:**
 
 Evidence that would increase the team’s confidence in the software’s reliability includes:
 
@@ -323,21 +144,11 @@ Evidence that would increase the team’s confidence in the software’s reliabi
 
 ### 19. Biggest Reliability Challenge
 
-At this stage of the project, what do you think will be the biggest challenge in producing reliable software?
-
-**Answer:**
-
 ---
 
 ## Process and Standards
 
 ### 20. Code Review Process
-
-What will be your code review process?
-
-Does someone other than the author review changes before merging, or is this informal?
-
-**Answer:**
 
 We use pull requests for code review. Each important feature will be developed on a separate branch. When the work is complete, the team member will push the branch and create a pull request. At least one other team member will review the changes before they are merged into the main branch. The reviewer will look at the code, the tests, error handling and if the change meets the project requirements.
 
