@@ -222,7 +222,7 @@ Have any members of your group used continuous integration before?
 
 We use GitHub Actions to run our tests automatically when code is pushed or a pull request is created. This allows us to catch problems early, before code is merged into the main branch. We can still do the tests manually while we are developing. But the automatic checks will be the main check before merging them.
 
-Some of the group members have experience with continuous integration, others less so. We can start with a simple workflow and help each other to understand how it works.
+Some of the group members have experience with continuous integration, others less so. One member has used GitHub Actions in a previous project. We can start with a simple workflow and help each other to understand how it works.
 
 ---
 
