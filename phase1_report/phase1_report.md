@@ -109,6 +109,12 @@ What parts of a web scraper do you expect could most easily fail, and how?
 
 **Answer:**
 
+HTML parsing is the component most likely to fail. CSS selectors and XPath queries break silently if the website’s underlying markup changes. The scraper is also fragile due to:
+
+* **Network issues:** Timeouts, connection resets, and non-200 HTTP responses.
+* **Document parsing problems:** Corrupted, password-protected/encrypted, or scanned non-searchable PDF, DOCX, or RTF documents.
+* **Character encoding mismatches:** Inconsistent character encodings (e.g., UTF-8 vs ISO-8859-1) that can corrupt document titles and text without raising an explicit crash.
+
 ---
 
 ### 6. External Factors
@@ -116,6 +122,13 @@ What parts of a web scraper do you expect could most easily fail, and how?
 Which external factors could make your software stop working after it has been completed?
 
 **Answer:**
+
+Several external factors outside our direct control could cause the software to stop functioning:
+
+* **Website redesigns & URL changes:** Alterations to DOM element hierarchies, CSS class names, or URL routing and pagination schemes.
+* **Anti-bot measures & access restrictions:** Introduction of rate limits, IP blocking, CAPTCHAs, or changes requiring user authentication/login.
+* **Client-side rendering:** Migration to dynamic JavaScript-rendered single-page application (SPA) architectures that require browser execution.
+* **Network & environment changes:** Server-side TLS/SSL certificate changes, deprecation of upstream HTTP/parsing libraries, or breaking runtime updates in Python.
 
 ---
 
@@ -127,6 +140,9 @@ Which do you expect will be hardest?
 
 **Answer:**
 
+* **Easiest to test:** Pure, deterministic logic that operates without network or filesystem dependencies. This includes CLI argument parsing, query string validation, and document parsing against static, local test fixtures.
+* **Hardest to test:** The live HTTP network layer, retry and backoff timing logic, and error paths for transient network failures (e.g., dropped connections, timeouts, partial downloads). Testing these reliably requires mock servers and simulated network faults rather than hitting the live university website.
+
 ---
 
 ### 8. Website Assumptions
@@ -136,6 +152,14 @@ What assumptions is your software likely to make about the website it scrapes?
 How could those assumptions be violated?
 
 **Answer:**
+
+Our software makes several key assumptions about the target website:
+
+* **Structural stability:** Assuming that HTML markup structure, element IDs, and CSS classes remain consistent.
+* **Protocol & metadata validity:** Assuming HTTP status codes are used accurately (e.g., 404 for missing pages) and that `Content-Type` headers correctly match the actual file content.
+* **Document integrity:** Assuming linked policy documents are well-formed and accessible directly via static HTTP GET requests without requiring JavaScript execution or session cookies.
+
+These assumptions can be violated at any time without prior notice if the website administrators update the CMS, restructure URL paths, or alter document hosting practices.
 
 ---
 
@@ -282,6 +306,14 @@ What might they try first?
 
 **Answer:**
 
+To find flaws in the application, another student might try:
+
+* **Invalid CLI arguments:** Passing missing, contradictory, or unexpected command-line flags and arguments.
+* **Network fault simulation:** Disconnecting the network during execution, introducing high latency/timeouts, or redirecting the tool to URLs returning 404/500 errors.
+* **Malformed data inputs:** Pointing the scraper to corrupted, empty, or non-standard file types.
+* **Concurrency and edge conditions:** Running multiple instances simultaneously against the same output directory or abruptly terminating the process (SIGINT/SIGTERM) mid-download.
+* **Error stream leaks:** Checking whether error messages or unhandled stack traces are leaked to standard output (`stdout`) instead of standard error (`stderr`).
+
 ---
 
 ### 17. Correctness of Output
@@ -322,6 +354,8 @@ Evidence that would increase the team’s confidence in the software’s reliabi
 At this stage of the project, what do you think will be the biggest challenge in producing reliable software?
 
 **Answer:**
+
+The biggest challenge is managing testing against an uncontrolled external dependency. Relying on the live website makes test suites slow, non-deterministic, and prone to flakiness, while relying solely on mocked tests risks making assumptions that do not reflect real-world site behaviors and failure modes. Balancing robust mock-based unit tests with realistic integration tests across three different document formats (PDF, Word, RTF) represents the primary reliability risk.
 
 ---
 
