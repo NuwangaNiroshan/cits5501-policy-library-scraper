@@ -35,6 +35,8 @@ Implementation and testing of the application will take place during Phase 2.
 ## Repository contents
 
 * [`phase1_report/`](./phase1_report/) – Phase 1 report and related files
+* [`tests/`](./tests/) – Test suite (currently a smoke test; real tests arrive in Phase 2)
+* [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) – CI pipeline (lint, type check, tests)
 * [`README.md`](./README.md) – Project overview and repository guide
 
 The Phase 1 report will be maintained in Markdown and submitted in both Markdown and PDF formats.
@@ -54,6 +56,19 @@ Student numbers and repository usernames are recorded in the Phase 1 report as r
 All team members will contribute through version control. Tasks will be allocated and tracked, and changes will be reviewed before being merged into the main branch.
 
 The team’s detailed communication, task-management, version-control and resource-risk practices will be recorded in the Collaboration & Workflow Plan.
+
+## Development setup
+
+The project uses Python with [uv](https://docs.astral.sh/uv/) for dependency management (the marking environment ships with both). To set up and run the same checks CI runs:
+
+```bash
+uv sync            # install dependencies from uv.lock
+uv run ruff check .   # lint
+uv run mypy .         # type check
+uv run pytest         # tests
+```
+
+Continuous integration runs these on every push to `main` and every pull request; merges are blocked if any check fails.
 
 ## Contribution workflow
 

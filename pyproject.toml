@@ -1,0 +1,13 @@
+[project]
+name = "policy-library-scraper"
+version = "0.1.0"
+description = "CITS5501/3501 Group 15 - policy library scraper (implemented in Phase 2)"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "mypy>=1.10",
+    "ruff>=0.5",
+]
