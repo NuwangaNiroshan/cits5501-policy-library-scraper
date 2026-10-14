@@ -57,6 +57,32 @@ All team members will contribute through version control. Tasks will be allocate
 
 The team’s detailed communication, task-management, version-control and resource-risk practices will be recorded in the Collaboration & Workflow Plan.
 
+## Phase 2 – Task 1 prototype
+
+`phase2/prototype/scrape_prototype.py` is the minimal scraper prototype for Phase 2 Task 1.
+
+* **Python:** 3.10 or later (the CI version); it uses the standard library only.
+* **Dependencies:** none for the prototype itself. `uv sync` is only needed for the lint, type-check and test commands below.
+* **Network:** it needs internet access to reach the course policy site.
+
+Run it from the repository root:
+
+```bash
+python3 phase2/prototype/scrape_prototype.py
+```
+
+It loads https://uwa-policy.cits5501.arranstewart.io/policy/, prints how many document links it found for each file type, then downloads up to 5 of them (cycling through up to five different file types). For each one it prints the URL, HTTP status, declared `Content-Type`, size in bytes, the first 16 bytes and an outcome (`OK`, `SUSPECT` or `FAILED`). Files are not saved to disk. A run takes about 20 seconds because the index and document requests are spaced 3.5 s apart to stay under the site's rate limit.
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--start-url URL` | course site | Index page to start from (e.g. `http://localhost:8000/policy/`) |
+| `--max-docs N` | 5 | Number of documents to download (3–5) |
+| `--max-requests N` | 20 | Hard cap on all HTTP requests: index, documents, redirect hops and retries |
+| `--delay S` | 3.5 | Seconds between requests |
+| `--timeout S` | 15 | Per-request timeout |
+
+The exit status is 0 only if at least 3 documents were downloaded and every one looks valid.
+
 ## Development setup
 
 The project uses Python with [uv](https://docs.astral.sh/uv/) for dependency management (the marking environment ships with both). To set up and run the same checks CI runs:
