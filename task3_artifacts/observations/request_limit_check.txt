@@ -1,0 +1,10 @@
+Request 1
+HTTP=200 time=0.970394s size=584187
+Request 2
+HTTP=200 time=1.077670s size=584187
+Request 3
+HTTP=200 time=0.869424s size=584187
+Request 4
+HTTP=200 time=0.959649s size=584187
+Request 5
+HTTP=200 time=1.151368s size=584187
