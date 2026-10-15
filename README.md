@@ -35,6 +35,7 @@ Implementation and testing of the application will take place during Phase 2.
 ## Repository contents
 
 * [`phase1_report/`](./phase1_report/) – Phase 1 report and related files
+* [`phase2_report/task4-adversarial-inputs.md`](./phase2_report/task4-adversarial-inputs.md) – Task 4 proposed adversarial-input tests (Sharmel; reviewer Swathy)
 * [`tests/`](./tests/) – Test suite (currently a smoke test; real tests arrive in Phase 2)
 * [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) – CI pipeline (lint, type check, tests)
 * [`README.md`](./README.md) – Project overview and repository guide
