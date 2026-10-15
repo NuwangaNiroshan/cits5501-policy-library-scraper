@@ -1,0 +1,38 @@
+## 2. Task 2 – Design of Test Suite
+
+### 2.1 Testing Objective
+
+The objective of this test suite is to evaluate the reliability and error-handling behaviour of a fully functional policy-document web scraper under unexpected website conditions. The tests focus on five scenarios: changes in website structure, truncated HTML responses, connection timeouts, HTTP client and server errors, and invalid or corrupted documents. The proposed test cases aim to verify that the scraper handles these situations predictably, either by recovering where appropriate or by reporting failures clearly without producing misleading results. Each test case follows the Arrange–Act–Assert approach to provide reproducible test conditions and measurable expected outcomes.
+
+### 2.2 Expected Scraper Behaviour
+
+A reliable policy-document scraper should handle unexpected website conditions without crashing, accepting invalid documents or reporting misleading results. When recovery is not possible, the scraper should clearly report the failure. The expected behaviour for each required scenario is outlined below.
+
+| Scenario | Expected Scraper Behaviour |
+|---|---|
+| **1. Website structure changes** | If changes to HTML elements or page structure prevent document links from being identified, the scraper should report an extraction failure rather than incorrectly indicating that scraping was successful. |
+| **2. Truncated HTML** | The scraper should handle incomplete HTML without crashing. It may extract valid links from the available content but should reject malformed links and report incomplete processing where appropriate. |
+| **3. Short- or long-term timeouts** | For temporary timeouts, the scraper may retry requests within a predefined limit. If the server remains unresponsive, it should stop retrying, report the timeout and avoid waiting indefinitely. |
+| **4. HTTP 4xx and 5xx errors** | The scraper should identify unsuccessful HTTP responses. Client errors such as 404 should be reported, while temporary server errors such as 503 may trigger limited retries. Failed responses must not be treated as successful downloads. |
+| **5. Invalid or corrupted documents** | The scraper should check whether downloaded content matches the expected document format. HTML returned instead of a PDF, or a corrupted document that cannot be opened, should be rejected or clearly flagged rather than marked as a successful download. |
+
+These expectations provide the basis for designing test cases that verify predictable error handling, appropriate recovery and accurate reporting of unsuccessful operations.
+
+### 2.3 Test Case Design
+
+Eight test cases are proposed to evaluate the scraper’s behaviour under the five required failure scenarios. Each test follows the Arrange–Act–Assert (AAA) structure to define the test conditions, execution and expected outcomes. The tests are designed for a production-level scraper rather than the minimal prototype.
+
+| Test ID | Related Scenario | Test Purpose | Arrange | Act | Assert |
+|---|---|---|---|---|---|
+| **T001** | Scenario 1: Website structure changes | Verify that the scraper detects changes that prevent its original extraction method from finding policy links. | Create an HTML fixture containing three valid PDF links, but change the original link containers and CSS classes so the scraper's original selectors no longer match. | Run the scraper against the modified page. | The scraper clearly reports an extraction failure instead of silently reporting a successful scrape with zero documents. |
+| **T002** | Scenario 2: Truncated HTML | Verify that the scraper handles incomplete HTML without incorrectly processing malformed links. | Configure a local server to return truncated HTML containing one complete PDF link followed by a second link with an incomplete URL. | Run the scraper against the incomplete HTML. | The scraper does not crash or attempt to download the incomplete URL. Any extracted URL must match a complete link in the fixture, and detected parsing problems must be reported. |
+| **T003** | Scenario 3: Temporary timeout | Verify that the scraper recovers from a temporary timeout using bounded retries. | Configure a test server to exceed the request timeout on the first attempt and return HTTP 200 with a valid PDF on the second. Allow two total attempts. | Run the scraper and request the PDF. | The first attempt times out, the second succeeds, and the scraper reports a successful download after exactly two attempts. |
+| **T004** | Scenario 3: Prolonged timeout | Verify that the scraper stops retrying when the server remains unresponsive. | Configure a server to delay every response beyond the configured 2-second timeout. Allow a maximum of three total attempts. | Run the scraper against the unresponsive endpoint. | The scraper makes no more than three attempts, reports a timeout failure, and does not wait indefinitely or report a successful download. |
+| **T005** | Scenario 4: HTTP 4xx error | Verify that the scraper handles an HTTP 404 response correctly. | Configure a document endpoint to return HTTP 404 (Not Found). Use a policy that does not retry permanent 404 errors. | Run the scraper and attempt to download the document. | The scraper records HTTP 404, reports the download as failed, does not save the error response as a valid document, and makes only one attempt. |
+| **T006** | Scenario 4: HTTP 5xx error | Verify that the scraper handles server errors using limited retries. | Configure a server to return HTTP 503 (Service Unavailable) for every request. Allow three total attempts. | Run the scraper and request the document. | The scraper stops after at most three attempts, reports HTTP 503 as a failed download, and does not incorrectly report success. |
+| **T007** | Scenario 5: PDF link returns HTML | Verify that the scraper rejects HTML content returned from a PDF URL. | Configure a `.pdf` endpoint to return HTTP 200 with `Content-Type: text/html` and an HTML error page instead of PDF data. | Run the scraper and attempt to download the PDF. | The scraper identifies the unexpected content type, rejects the HTML response, and reports an invalid document rather than a successful PDF download. |
+| **T008** | Scenario 5: Corrupted PDF | Verify that the scraper detects a corrupted PDF despite a valid-looking filename, header and content type. | Configure a server to return HTTP 200 with `Content-Type: application/pdf` and corrupted data beginning with `%PDF-` that a PDF parser cannot open. | Run the scraper and validate the downloaded content. | The scraper detects the invalid PDF structure, reports a document-validation failure, and does not classify the corrupted file as a successful download. |
+
+### 2.4 Test Coverage and Rationale
+
+The proposed test suite contains eight test cases covering all five failure scenarios specified in the project requirements. T001 evaluates changes in website structure, while T002 examines truncated HTML responses. T003 and T004 assess temporary and prolonged timeouts, verifying that recovery attempts remain within predefined limits. T005 and T006 examine HTTP client and server errors, ensuring that unsuccessful responses are handled appropriately. T007 and T008 assess document validation by testing incorrect content types and corrupted PDF files. Controlled fixtures and simulated server responses are proposed to make these conditions reproducible without relying on unpredictable failures in the live website. Overall, the test suite evaluates the scraper’s ability to recover when appropriate, report failures accurately and avoid incorrectly identifying unsuccessful downloads as successful.
