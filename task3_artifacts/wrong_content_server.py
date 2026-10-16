@@ -1,31 +1,28 @@
-"""Local HTTP test double for Phase 2 Task 3.
+"""Controlled HTTP server for the Phase 2 Task 3 test double."""
 
-The server provides a URL ending in .pdf but deliberately returns HTML.
-This creates a repeatable failure scenario for testing the scraper.
-"""
-
+import argparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 HOST = "127.0.0.1"
-PORT = 8000
+DEFAULT_PORT = 8000
 FAKE_PDF_PATH = "/fake-policy.pdf"
 
-HTML_BODY = b"""<!DOCTYPE html>
+HTML_RESPONSE = b"""<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Not a PDF</title>
+  <meta charset="utf-8">
+  <title>Not a PDF</title>
 </head>
 <body>
-    <h1>Policy document unavailable</h1>
-    <p>This response is HTML, not a PDF document.</p>
+  <h1>Policy document unavailable</h1>
+  <p>This response is HTML, not a PDF document.</p>
 </body>
 </html>
 """
 
 
 class WrongContentHandler(BaseHTTPRequestHandler):
-    """HTTP handler that returns HTML for a fake PDF URL."""
+    """Return HTML from a URL that appears to be a PDF."""
 
     def do_GET(self) -> None:
         """Handle GET requests."""
@@ -35,32 +32,41 @@ class WrongContentHandler(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(HTML_BODY)))
+        self.send_header("Content-Length", str(len(HTML_RESPONSE)))
         self.end_headers()
-        self.wfile.write(HTML_BODY)
-
-    def log_message(self, format: str, *args: object) -> None:
-        """Disable normal request logging."""
-        return
+        self.wfile.write(HTML_RESPONSE)
 
 
-def main() -> None:
-    """Start the local test-double server."""
-    server = HTTPServer((HOST, PORT), WrongContentHandler)
+def run_server(port: int) -> None:
+    """Run the controlled HTTP test-double server."""
+    server = HTTPServer((HOST, port), WrongContentHandler)
 
-    print(
-        f"Task 3 test double running at "
-        f"http://{HOST}:{PORT}{FAKE_PDF_PATH}"
-    )
+    print(f"Task 3 test-double server running at http://{HOST}:{port}")
+    print(f"Test URL: http://{HOST}:{port}{FAKE_PDF_PATH}")
     print("Press Ctrl+C to stop.")
 
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        pass
+        print("\nStopping server.")
     finally:
         server.server_close()
 
 
+def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Run the Task 3 controlled HTTP test double."
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=DEFAULT_PORT,
+        help=f"Port to listen on (default: {DEFAULT_PORT})",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    main()
+    arguments = parse_args()
+    run_server(arguments.port)

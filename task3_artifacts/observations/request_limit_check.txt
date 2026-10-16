@@ -1,10 +1,47 @@
+Task 3 – Live-Site Request Observation
+
+URL:
+https://uwa-policy.cits5501.arranstewart.io/policy/
+
+Date:
+<enter the actual date/time you ran this test>
+If exact time was not recorded, state that clearly.
+
+Purpose:
+Perform a small controlled check for obvious request limiting without placing
+unnecessary load on the live policy website.
+
+Command:
+
+for i in {1..5}; do
+  echo "Request $i"
+  curl -L -sS -o /dev/null \
+    -w "HTTP=%{http_code} time=%{time_total}s size=%{size_download}\n" \
+    https://uwa-policy.cits5501.arranstewart.io/policy/
+  sleep 2
+done
+
+Results:
+
 Request 1
 HTTP=200 time=0.970394s size=584187
+
 Request 2
 HTTP=200 time=1.077670s size=584187
+
 Request 3
 HTTP=200 time=0.869424s size=584187
+
 Request 4
 HTTP=200 time=0.959649s size=584187
+
 Request 5
 HTTP=200 time=1.151368s size=584187
+
+Observation:
+All five requests returned HTTP 200 with the same response size and reasonably
+similar response times.
+
+No obvious request limiting was observed during this small controlled test.
+This does not prove that the website has no request limits under higher or
+faster request rates.

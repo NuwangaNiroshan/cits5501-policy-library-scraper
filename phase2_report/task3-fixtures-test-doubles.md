@@ -72,25 +72,101 @@ Using test doubles also allows the Task 2 failure scenarios to be tested repeate
 
 ### Test-Double Artifact – Incorrect Content for a PDF Link
 
-We created a controlled local HTTP test double in:
+The artifact is located at:
 
 `task3_artifacts/wrong_content_server.py`
 
-The server provides the following URL:
+It provides a controlled HTTP endpoint:
 
-`http://127.0.0.1:8000/fake-policy.pdf`
+`/fake-policy.pdf`
 
-The URL ends in `.pdf`, but the server deliberately returns:
+Although the URL ends in `.pdf`, the server deliberately returns:
 
-- HTTP status `200`
-- Content type `text/html; charset=utf-8`
-- HTML content instead of a PDF document
+- HTTP `200`
+- `Content-Type: text/html; charset=utf-8`
+- HTML content instead of PDF content
+- no `%PDF` file signature
 
-This demonstrates a failure scenario where a link appears to point to a PDF policy document, but the server returns the wrong type of content.
+This behaves like a controlled stub because it always returns a known response
+for the selected endpoint.
 
-The local server acts as a test double, similar to a stub, because it replaces the real website and returns a fixed response that we control. This allows the same failure condition to be reproduced every time the test is run.
-
-The server can be started with:
+Run the artifact with:
 
 ```bash
 python3 task3_artifacts/wrong_content_server.py
+```
+
+Then check the response with:
+
+```bash
+curl -i http://127.0.0.1:8000/fake-policy.pdf
+```
+
+If port `8000` is already being used, another port can be selected:
+
+```bash
+python3 task3_artifacts/wrong_content_server.py --port 8010
+```
+
+### Automated Verification
+
+The automated test is located at:
+
+`tests/test_task3_wrong_content_server.py`
+
+The test starts the controlled HTTP server on an available local port and
+verifies that:
+
+- the response status is HTTP `200`
+- the content type is HTML
+- the body contains HTML
+- the body does not start with the `%PDF` signature
+
+The server is then shut down automatically.
+
+The test can be run with:
+
+```bash
+uv run pytest tests/test_task3_wrong_content_server.py -v
+```
+
+The full project checks are:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run mypy .
+```
+
+### Expected Scraper Behaviour
+
+A scraper should not assume that a URL ending in `.pdf` contains a valid PDF.
+
+The response should also be checked using information such as:
+
+- HTTP status
+- `Content-Type`
+- file signature or first bytes
+- expected document format
+
+A normal PDF commonly starts with `%PDF`. The controlled response instead
+contains HTML and does not contain this PDF signature.
+
+The current automated test verifies the behaviour of the test double itself.
+Once the Task 1 scraper is integrated, this test double can also be used as
+controlled input to verify that the scraper detects and rejects the invalid
+PDF response.
+
+### Why the Live Website Is Not Suitable for This Test
+
+The live policy website normally serves real policy documents.
+
+We cannot make the real server return HTML from a `.pdf` URL exactly when a
+test requires that failure. Even if this problem occurred naturally, we would
+not know when it would happen and could not reproduce it consistently.
+
+Trying to create failures against the live server would also be inappropriate
+and could generate unnecessary traffic.
+
+The local test double gives us a safe, predictable and repeatable way to test
+the same failure scenario.
