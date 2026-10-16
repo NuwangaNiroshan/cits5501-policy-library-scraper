@@ -4,8 +4,7 @@ URL:
 https://uwa-policy.cits5501.arranstewart.io/policy/
 
 Date:
-<enter the actual date/time you ran this test>
-If exact time was not recorded, state that clearly.
+14 October 2026 (exact time not recorded)
 
 Purpose:
 Perform a small controlled check for obvious request limiting without placing
