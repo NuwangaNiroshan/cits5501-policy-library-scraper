@@ -41,7 +41,7 @@ The Phase 2 report is maintained in Markdown and will be submitted in both Markd
 
 ## Team
 
-* Roshan Sada Shanker
+* Roshan Shanker
 * Nuwanga Niroshan Hewa Wiladdarage
 * Cam Zhou
 * Sharmel Rayen Remington Villava Rayen
