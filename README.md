@@ -18,29 +18,26 @@ The project focuses on reliability and testing in an unpredictable web environme
 
 ## Current status
 
-The project is currently in **Phase 1: Planning and Organisation**.
+The repository contains the completed **Phase 2** submission materials:
 
-During Phase 1, the team is establishing its:
-
-* Collaboration and communication process
-* Task-tracking approach
-* Version-control workflow
-* Implementation language and development tools
-* Code-review and quality practices
-* Testing strategy
-* Technical and resource risk-management approach
-
-Implementation and testing of the application will take place during Phase 2.
+* a minimal policy-document scraper prototype;
+* a written test-suite design covering the five required failure scenarios;
+* fixtures and a working local HTTP test double;
+* proposed adversarial inputs for testing another team's scraper; and
+* the combined Phase 2 report in Markdown.
 
 ## Repository contents
 
 * [`phase1_report/`](./phase1_report/) – Phase 1 report and related files
-* [`phase2_report/task4-adversarial-inputs.md`](./phase2_report/task4-adversarial-inputs.md) – Task 4 proposed adversarial-input tests (Sharmel; reviewer Swathy)
-* [`tests/`](./tests/) – Test suite (currently a smoke test; real tests arrive in Phase 2)
+* [`phase2/prototype/`](./phase2/prototype/) – Task 1 scraper prototype
+* [`phase2_report/phase2_report.md`](./phase2_report/phase2_report.md) – combined Phase 2 report
+* [`phase2_report/`](./phase2_report/) – individual report sections for Tasks 1–4
+* [`task3_artifacts/`](./task3_artifacts/) – Task 3 local test double, observations and instructions
+* [`tests/`](./tests/) – automated smoke test and Task 3 artifact verification
 * [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) – CI pipeline (lint, type check, tests)
 * [`README.md`](./README.md) – Project overview and repository guide
 
-The Phase 1 report will be maintained in Markdown and submitted in both Markdown and PDF formats.
+The Phase 2 report is maintained in Markdown and will be submitted in both Markdown and PDF formats.
 
 ## Team
 
