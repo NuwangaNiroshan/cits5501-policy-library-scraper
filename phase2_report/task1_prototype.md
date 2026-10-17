@@ -22,13 +22,13 @@ The prototype is a single Python script that uses only the standard library
    extension (`%PDF-` for PDF, `PK\x03\x04` for docx/pptx, the 8-byte OLE2 header
    `D0 CF 11 E0 A1 B1 1A E1` for legacy `.doc`, `{\rtf` for RTF). It reports `SUSPECT` when
    the status is 200 but the bytes do not match, and `FAILED` otherwise.
-5. Requests are limited by a hard budget of 20. The budget counts every HTTP request:
+5. Requests are limited by a hard budget of at most 20 (`--max-requests` accepts only 1–20). The budget counts every HTTP request:
    the index, each document, each redirect hop and each retry. The index and document
-   requests are spaced 3.5 s apart; redirect hops follow straight away. On a `429` the script waits for a numeric `Retry-After`
+   requests are spaced 3.5 s apart so the live site does not receive rapid requests; redirect hops follow straight away. On a `429` the script waits for a numeric `Retry-After`
    (capped at 15 s) and retries once, then gives up. The exit status is 0 only when
    at least 3 documents were downloaded and all of them look valid.
 
-Live run on 13 Oct 2026 (abridged: entries 2–5 are condensed to one line each; 6 of 20 requests used):
+Live run on 17 Oct 2026 (abridged: entries 2–5 are condensed to one line each; 6 of 20 requests used):
 
 ```text
 Found 216 candidate document links (.doc x96, .docx x48, .pdf x65, .pptx x3, .rtf x4)

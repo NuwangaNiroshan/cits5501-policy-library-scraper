@@ -71,13 +71,13 @@ Run it from the repository root:
 python3 phase2/prototype/scrape_prototype.py
 ```
 
-It loads https://uwa-policy.cits5501.arranstewart.io/policy/, prints how many document links it found for each file type, then downloads up to 5 of them (cycling through up to five different file types). For each one it prints the URL, HTTP status, declared `Content-Type`, size in bytes, the first 16 bytes and an outcome (`OK`, `SUSPECT` or `FAILED`). Files are not saved to disk. A run takes about 20 seconds because the index and document requests are spaced 3.5 s apart to stay under the site's rate limit.
+It loads https://uwa-policy.cits5501.arranstewart.io/policy/, prints how many document links it found for each file type, then downloads up to 5 of them (cycling through up to five different file types). For each one it prints the URL, HTTP status, declared `Content-Type`, size in bytes, the first 16 bytes and an outcome (`OK`, `SUSPECT` or `FAILED`). Files are not saved to disk. A run takes about 20 seconds because the index and document requests are spaced 3.5 s apart so the live site does not receive rapid requests.
 
 | Option | Default | Meaning |
 |---|---|---|
 | `--start-url URL` | course site | Index page to start from (e.g. `http://localhost:8000/policy/`) |
 | `--max-docs N` | 5 | Number of documents to download (3–5) |
-| `--max-requests N` | 20 | Hard cap on all HTTP requests: index, documents, redirect hops and retries |
+| `--max-requests N` | 20 | Hard cap on all HTTP requests: index, documents, redirect hops and retries (1–20; larger, zero or negative values are rejected) |
 | `--delay S` | 3.5 | Seconds between requests |
 | `--timeout S` | 15 | Per-request timeout |
 

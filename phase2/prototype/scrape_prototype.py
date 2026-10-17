@@ -23,6 +23,7 @@ from urllib.parse import urldefrag, urljoin, urlsplit
 DEFAULT_START_URL = "https://uwa-policy.cits5501.arranstewart.io/policy/"
 USER_AGENT = "CITS5501-Group15-prototype/0.1 (student project)"
 MIN_DOCS = 3  # the brief asks for 3-5 distinct documents
+MAX_REQUESTS = 20  # the brief allows at most 20 requests in total
 
 # Extensions we treat as "policy documents" (office files and PDFs).
 DOCUMENT_EXTENSIONS = (
@@ -142,6 +143,8 @@ class Fetcher:
     """
 
     def __init__(self, max_requests: int, delay: float, timeout: float) -> None:
+        if not 1 <= max_requests <= MAX_REQUESTS:
+            raise ValueError(f"max_requests must be between 1 and {MAX_REQUESTS}")
         self.max_requests = max_requests
         self.delay = delay
         self.timeout = timeout
@@ -152,7 +155,7 @@ class Fetcher:
         if self.used >= self.max_requests:
             raise RuntimeError(f"request budget of {self.max_requests} exhausted")
         if pause and self.used and self.delay:
-            time.sleep(self.delay)  # be polite: the live site rate-limits
+            time.sleep(self.delay)  # space requests out rather than hitting the live site rapidly
         self.used += 1
         request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
         try:
@@ -242,6 +245,17 @@ def run(start_url: str, max_docs: int, max_requests: int, delay: float,
     return results
 
 
+def request_budget(text: str) -> int:
+    """argparse type for --max-requests: an integer from 1 to MAX_REQUESTS."""
+    try:
+        value = int(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"invalid int value: {text!r}") from None
+    if not 1 <= value <= MAX_REQUESTS:
+        raise argparse.ArgumentTypeError(f"must be between 1 and {MAX_REQUESTS}, got {value}")
+    return value
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--start-url", default=DEFAULT_START_URL,
@@ -249,8 +263,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-docs", type=int, default=5, choices=range(MIN_DOCS, 6),
                         metavar="{3,4,5}",
                         help="number of documents to download, 3-5 (default 5)")
-    parser.add_argument("--max-requests", type=int, default=20,
-                        help="hard cap on HTTP requests, incl. index (default 20)")
+    parser.add_argument("--max-requests", type=request_budget, default=MAX_REQUESTS,
+                        metavar="N",
+                        help=f"hard cap on HTTP requests, incl. index, 1-{MAX_REQUESTS} "
+                             f"(default {MAX_REQUESTS})")
     parser.add_argument("--delay", type=float, default=3.5,
                         help="seconds between requests (default 3.5)")
     parser.add_argument("--timeout", type=float, default=15.0,
