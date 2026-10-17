@@ -6,7 +6,7 @@ The objective of this test suite is to evaluate the reliability and error-handli
 
 ### 2.2 Expected Scraper Behaviour
 
-A reliable policy-document scraper should handle unexpected website conditions without uncontrolled failures, accepting invalid documents or reporting misleading results. Where recovery is possible, it should continue processing. Otherwise, it should report the failure clearly. The expected behaviour for each required scenario is outlined below.
+A reliable policy-document scraper should handle unexpected website conditions without crashing. It should not accept invalid documents or report misleading results. Where recovery is possible, it should continue processing. Otherwise, it should report the failure clearly. The expected behaviour for each required scenario is outlined below.
 
 | Scenario | Expected Scraper Behaviour |
 |---|---|
