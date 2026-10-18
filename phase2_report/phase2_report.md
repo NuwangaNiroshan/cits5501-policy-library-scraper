@@ -10,7 +10,7 @@
 | 24684008       | Nuwanga Niroshan Hewa Wiladdarage     | NuwangaNiroshan |
 | 24349432       | Cam Zhou                              | camzhou831-star |
 | 25079168       | Sharmel Rayen Remington Villava Rayen | SharmelRayen    |
-| 25068786       | Swathy Shenoy                         | Swathymahesh    |
+| 25068786       | Swathy Mahesh Shenoy                  | Swathymahesh    |
 
 ## Overview
 
