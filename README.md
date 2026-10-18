@@ -45,7 +45,7 @@ The Phase 2 report is maintained in Markdown and will be submitted in both Markd
 * Nuwanga Niroshan Hewa Wiladdarage
 * Cam Zhou
 * Sharmel Rayen Remington Villava Rayen
-* Swathy Shenoy
+* Swathy Mahesh Shenoy
 
 Student numbers and repository usernames are recorded in the Phase 1 report as required by the project specification.
 
